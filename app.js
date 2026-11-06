@@ -33,3 +33,9 @@ $('restoreFile').addEventListener('change',async e=>{const file=e.target.files[0
 function resetData(){if(confirm('Wirklich ALLE lokalen TeacherOS-Daten löschen?')){state=defaultState();persist()}}
 function render(){renderHome();renderTasks();renderWeek();renderNotes();renderEvents();renderLinks()}
 const now=new Date();text($('dateNow'),now.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));text($('greeting'),now.getHours()<11?'Guten Morgen!':now.getHours()<18?'Guten Tag!':'Guten Abend!');$('taskDate').value='';render();if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+// Lehrerkalender-V8: explizite Seitenziele aus den Lesezeichen der eingereichten PDF.
+const plannerSections=[['Inhalt',2],['Jahresübersicht',3],['Schultermine',5],['Wochenplanung',18],['Klassenlisten',177],['Notenlisten',185],['Notizen',197],['Monats-Dashboards',206],['Klassen-Cockpits',218],['Stoffverteilung',230],['Unterrichtsreihen',242],['Leistungsnachweise',254],['Gesprächsprotokolle',258],['Förderplanung',264],['PLAN B',268],['Digitale Toolbox',282],['Besprechungen',284],['Protokolle 7–24',288]];
+const plannerJumpList=document.getElementById('plannerJumps');
+for(const [label,page] of plannerSections){const b=document.createElement('button');b.type='button';b.textContent=label+' · S. '+page;b.addEventListener('click',()=>plannerPage(page,label));plannerJumpList.append(b)}
+function plannerPage(page,label){const number=Number(page);if(!Number.isInteger(number)||number<1||number>305)return;const url='Lehrerkalender_V8.pdf#page='+number;const frame=document.getElementById('plannerFrame');frame.src=url;document.getElementById('plannerExternal').href=url;document.getElementById('plannerCurrent').textContent='Seite '+number+(label?' – '+label:'');changeTab('planner')}

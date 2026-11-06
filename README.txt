@@ -1,20 +1,16 @@
-TeacherOS v0.1 – Funktionsfähiger lokaler Web-App-Prototyp
+TeacherOS v0.2 – Lehrerkalender integriert
 
-INHALT
-index.html, app.js, manifest.webmanifest, sw.js, App-Symbole.
+NEU: zusätzlicher Reiter "Lehrerkalender", vollständige PDF V8 und Direktlinks auf die PDF-Seiten.
 
-TESTEN AM RECHNER
-Im entpackten Ordner: python3 -m http.server 8000
-Im Browser: http://localhost:8000
+UPDATE DES BEREITS INSTALLIERTEN TEACHEROS:
+1. Bei GitHub in deinem bestehenden Repository TeacherOS unter "Add file" -> "Upload files" wechseln.
+2. Alle acht Dateien aus diesem ZIP-Paket hochladen (in dasselbe Hauptverzeichnis, nicht den Ordner selbst).
+3. Vorhandene Dateien namens index.html, app.js, sw.js, README.txt, manifest.webmanifest und Icons überschreiben/bestätigen.
+4. "Commit changes" drücken. GitHub Pages übernimmt die neue Version.
+5. TeacherOS am iPad neu öffnen, bei alter Anzeige Browserseite neu laden; ggf. App schließen/neu starten.
 
-IPAD-NUTZUNG
-Für eine Installation als Home-Bildschirm-App muss der gesamte Ordner auf einem HTTPS-Webhost veröffentlicht werden, z. B. GitHub Pages (nur App-Code, KEINE privaten Schul-/Schülerdaten ins Repository!). Danach die HTTPS-Adresse auf dem iPad in Safari öffnen > Teilen > Zum Home-Bildschirm > Als Web-App öffnen.
-
-FUNKTIONEN
-Aufgaben (Termine, Priorität, erledigt), Wochenstundenplan, Notizen/Gesprächsprotokolle, ICS-Kalenderimport (einfache VEVENT), externe GoodNotes-/Drive-Links, regelbasierte Dashboard-Hinweise, KI-Arbeitsauftrag zur manuellen Übergabe, JSON-Sicherung/Wiederherstellung, Offline-App-Shell.
-
-BEKANNTE GRENZEN
-Keine OpenAI-API oder serverseitige KI, keine automatischen Erinnerungen, keine Google-Calendar-OAuth-Synchronisierung, keine GoodNotes-Daten-Synchronisierung. Keine Verarbeitung von RRULE-Serienterminen, Zeitzonen oder Kalenderupdates/Absagen. Kein Zugriffsschutz und keine lokale Verschlüsselung. LocalStorage ist kein sicherer Speicher für personenbezogene Schülerdaten. Nutzung nur mit unsensiblen Test-/Organisationsdaten.
-
-ARCHITEKTUR NÄCHSTER AUSBAU
-Frontend PWA (TypeScript/React möglich) -> abgesichertes Backend -> Auth -> Datenbank/Postgres mit Rechtekonzept -> Kalender OAuth -> KI-Proxy mit minimierten Daten -> Scheduler/Push -> Audit/Backups. Datenschutzprüfung vor Verarbeitung von Schülerdaten.
+WICHTIGER DATENSCHUTZ-HINWEIS:
+GitHub Pages ist öffentlich erreichbar; PDF und Programmdateien sind für alle mit der URL abrufbar.
+Nur die LEERE PDF-Vorlage hier ablegen. Keine Schülernamen, Noten, ausgefüllten Protokolle oder sonstigen sensiblen Daten veröffentlichen.
+Die Integration ist eine PDF-Leseansicht und KEINE GoodNotes-Synchronisation.
+TeacherOS-Aufgaben bleiben weiterhin im Browser des jeweiligen Geräts lokal gespeichert; diese Dateien ersetzen keine Benutzerdaten. Vor Updates empfiehlt sich eine JSON-Datensicherung über den Daten-Reiter.
