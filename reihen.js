@@ -25,7 +25,7 @@ function renderReihen(){
    const progress=reihenMake('label','field','Rückblick / nächster Schritt');const area=document.createElement('textarea');area.value=item.reflection||'';area.placeholder='Was wurde geschafft? Was muss wiederholt werden?';area.addEventListener('change',()=>{item.reflection=area.value;persist()});progress.append(area);box.append(progress);
    const mats=reihenMake('div','smalltxt','Materialien: '+(item.materials||'keine vermerkt'));box.append(mats);
    const actions=reihenMake('div','actions');
-   const remove=reihenMake('button','btn secondary small','Stunde löschen');remove.type='button';remove.addEventListener('click',()=>{if(confirm('Diese Stunde wirklich löschen?')){r.lessons=r.lessons.filter(l=>l.id!==item.id);persist()}});actions.append(remove);box.append(actions);list.append(box);
+   const remove=reihenMake('button','btn secondary small','Stunde löschen');remove.type='button';remove.addEventListener('click',()=>{if(confirm('Diese Stunde wirklich löschen?')){r.lessons=r.lessons.filter(l=>l.id!==item.id);persist()}});actions.append(remove);const mat=reihenMake('button','btn secondary small','📷 Materialien');mat.type='button';mat.addEventListener('click',()=>{changeTab('material');if(typeof matOpenLesson==='function')matOpenLesson(r.id,item.id)});actions.append(mat);box.append(actions);list.append(box);
  }
 }
 $('reiheAdd').addEventListener('click',()=>{
