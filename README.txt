@@ -1,26 +1,11 @@
-TeacherOS 0.3 – Unterrichtsstudio / Materialwerkstatt
+TeacherOS 0.4 – Design Studio und MathLab
 
-WAS NEU IST
-- Unterrichtsvorbereitung mit Fach, Klasse, Thema, Lernziel, Dauer, Materialhinweisen
-- Lokal gespeicherte Unterrichtsplanungen
-- KI-Aufträge für sechs Arten von Unterrichtsmaterial, darunter vorhandene PPTX überarbeiten
-- KI-Auftrag kopieren oder als TXT sichern und in ChatGPT verwenden
-- Bestehendes Dashboard, Lehrerkalender V8, Aufgaben, Notizen, ICS bleiben erhalten
+1. Vor Aktualisierung in TeacherOS unter Daten eine JSON-Sicherung erstellen.
+2. Dateien dieses Ordners in dasselbe GitHub-Repository hochladen. Bereits vorhandene Dateien werden ersetzt, wenn sie verändert sind.
+3. In der installierten App die neue Version aufrufen.
 
-AKTUALISIERUNG
-1. Vor dem Update in TeacherOS unter „Daten“ eine JSON-Sicherung exportieren.
-2. Alle acht Dateien dieser ZIP in das Stammverzeichnis deines GitHub-Repositories hochladen.
-3. Bestehende Dateinamen ersetzen, kein Unterverzeichnis anlegen.
-4. GitHub Pages auf main / root belassen. Falls alte Version sichtbar, Seite neu laden.
+NEU: Design Studio mit lokal gespeicherten Fachprofilen und MathLab mit bis zu drei Original-Aufgabenausschnitten und optional drei Merkkästen auf einer vierten Seite. Im Browser kannst du drucken oder als PDF sichern.
 
-DATEN UND GRENZEN
-- Es findet KEINE direkte PPTX-Analyse oder KI-Verarbeitung in TeacherOS statt.
-- Für PowerPoint-Überarbeitung in ChatGPT den erzeugten Auftrag verwenden und PPTX dort separat hochladen.
-- Kein automatischer GoodNotes-Datenaustausch, kein Login, keine iPad-Lenovo-Synchronisierung.
-- Lokal gespeicherte Daten sind nicht verschlüsselt und nicht automatisch gesichert.
-- GitHub Pages ist öffentlich; KEINE personenbezogenen Schülerdaten oder ausgefüllte Lehrerkalender hochladen.
-- Bei schulischem Dienst-iPad lokale Datenhaltung und erlaubte Nutzung beachten.
+WICHTIG: Schulbuchbilder ausschließlich lokal in MathLab auswählen, nicht ins öffentliche GitHub hochladen. Es werden keine Fotos serverseitig gespeichert; beim Schließen der App ist die Auswahl weg. Bestehende Aufgaben, Notizen und Stundenplanungen nutzen weiterhin den bisherigen localStorage-Schlüssel teacheros-v01.
 
-BACKUP
-- Das JSON-Backup enthält nun auch lessons, wenn vorhanden. Ältere Backups bleiben importierbar.
-- Vor einer Wiederherstellung immer erst das aktuelle Backup exportieren.
+Für PDF-Schulbuchvorlagen: PDF auf dem iPad öffnen und jede Aufgabe als zugeschnittenen Screenshot (PNG/JPG) importieren. Automatisches PDF-Zuschneiden ist noch nicht enthalten.
