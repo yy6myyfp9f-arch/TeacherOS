@@ -1,11 +1,25 @@
-TeacherOS 0.4 – Design Studio und MathLab
+TeacherOS v0.5 – MathLab PDF-Direktimport (Testversion)
 
-1. Vor Aktualisierung in TeacherOS unter Daten eine JSON-Sicherung erstellen.
-2. Dateien dieses Ordners in dasselbe GitHub-Repository hochladen. Bereits vorhandene Dateien werden ersetzt, wenn sie verändert sind.
-3. In der installierten App die neue Version aufrufen.
+NEU
+- PDF in MathLab direkt auswählen, Seite wechseln, mit Finger/Maus Aufgabe markieren.
+- Ausgeschnittenen PDF-Bereich einer der 3 Aufgaben oder dem Merkkasten zuordnen.
+- Mehrere Aufgaben aus einer PDF oder aus mehreren Seiten in einem Arbeitsgang zusammenstellen.
+- Bewährtes 5-mm-Raster, DIN-A4-Seiten und bisherige Bildimportfunktion erhalten.
 
-NEU: Design Studio mit lokal gespeicherten Fachprofilen und MathLab mit bis zu drei Original-Aufgabenausschnitten und optional drei Merkkästen auf einer vierten Seite. Im Browser kannst du drucken oder als PDF sichern.
+NUTZUNG
+1) MathLab öffnen, PDF auswählen.
+2) Bei Bedarf PDF-Seite wählen. Den Ausschnitt mit Finger oder Maus markieren.
+3) Ziel (Aufgabe 1, 2, 3 oder Merkkasten) wählen und „Ausschnitt übernehmen“ tippen.
+4) Für weitere Aufgaben wiederholen. A4-Vorschau erzeugen und drucken/PDF sichern.
 
-WICHTIG: Schulbuchbilder ausschließlich lokal in MathLab auswählen, nicht ins öffentliche GitHub hochladen. Es werden keine Fotos serverseitig gespeichert; beim Schließen der App ist die Auswahl weg. Bestehende Aufgaben, Notizen und Stundenplanungen nutzen weiterhin den bisherigen localStorage-Schlüssel teacheros-v01.
+DATENSCHUTZ UND TECHNIK
+- Ausgewählte PDF-Dateien und Aufgabenausschnitte bleiben auf dem Gerät und werden nicht hochgeladen.
+- PDF.js wird beim ersten PDF-Import über jsDelivr geladen; dafür ist Internet notwendig.
+- Kein Backend, keine OpenAI-API-Kosten.
+- Vor Update JSON-Datensicherung anlegen. GitHub Pages speichert die persönlichen Aufgaben weiterhin NICHT.
+- Kein vollständiger Praxistest unter iPadOS möglich; Testversion.
+- Nicht zum öffentlichen Veröffentlichen geschützter Schulbuchausschnitte verwenden.
 
-Für PDF-Schulbuchvorlagen: PDF auf dem iPad öffnen und jede Aufgabe als zugeschnittenen Screenshot (PNG/JPG) importieren. Automatisches PDF-Zuschneiden ist noch nicht enthalten.
+INSTALLATION
+Bestehende Dateien im GitHub-Repository durch die Dateien aus diesem ZIP ersetzen.
+index.html, app.js, sw.js und README.txt ändern sich. Die übrigen Dateien bleiben erhalten.

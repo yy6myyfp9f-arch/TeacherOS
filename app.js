@@ -77,5 +77,75 @@ function mathMemory(){const page=el('article','math-a4');const h=el('div','math-
 function mathGenerate(){const preview=$('mathPreview'),print=$('mathPrintArea');preview.replaceChildren();print.replaceChildren();let count=0;for(let i=0;i<3;i++)if(mathImages[i]){const page=mathPage(i);preview.append(page);print.append(page.cloneNode(true));count++}if(mathImages[3]){const page=mathMemory();preview.append(page);print.append(page.cloneNode(true));count++}if(!count){preview.append(el('div','empty','Bitte mindestens einen Schulbuchausschnitt auswählen.'));text($('mathStatus'),'Keine Bilder ausgewählt.');return false}text($('mathStatus'),`${count} DIN-A4-Druckseite(n) vorbereitet. Beim Drucken A4 und 100 % wählen, Kopf-/Fußzeilen bei Bedarf ausschalten. Die Buchabbildungen bleiben nur im Speicher dieser Sitzung.`);mathDirty=false;return true}
 function mathPrint(){if(mathDirty && !mathGenerate())return;if(!$('mathPrintArea').children.length)return;window.print()}
 function mathClear(){for(let i=0;i<4;i++){if(mathImages[i]?.url)URL.revokeObjectURL(mathImages[i].url);mathImages[i]=null;$('mathFile'+(i+1)).value='';text($('mathThumb'+(i+1)),'Noch kein Bild ausgewählt')}for(const id of ['mathPreview','mathPrintArea'])$(id).replaceChildren();mathDirty=true;text($('mathStatus'),'Bilder aus der aktuellen Sitzung entfernt. Andere TeacherOS-Daten bleiben erhalten.')}
+// v0.5: PDF-Auswahl bleibt lokal im Browser. PDF.js wird erst bei Bedarf geladen.
+let mathPdfDocument=null, mathPdfRendered=null, mathPdfSelectionRect=null, mathPdfLibrary=null, mathPdfRenderTask=null;
+const mathPdfCanvas=$('mathPdfCanvas'), mathPdfHolder=$('mathPdfHolder'), mathPdfSelection=$('mathPdfSelection');
+function mathPdfMessage(message){text($('mathPdfStatus'),message)}
+async function mathPdfLoadLibrary(){
+ if(mathPdfLibrary)return mathPdfLibrary;
+ const lib=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');
+ lib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+ mathPdfLibrary=lib;return lib;
+}
+function mathPdfResetSelection(){mathPdfSelectionRect=null;mathPdfSelection.hidden=true;$('mathPdfUse').disabled=true}
+function mathPdfDrawSelection(){
+ const r=mathPdfSelectionRect;if(!r){mathPdfSelection.hidden=true;return}
+ const rect=mathPdfCanvas.getBoundingClientRect();
+ mathPdfSelection.style.left=(r.x/mathPdfCanvas.width*100)+'%';mathPdfSelection.style.top=(r.y/mathPdfCanvas.height*100)+'%';
+ mathPdfSelection.style.width=(r.w/mathPdfCanvas.width*100)+'%';mathPdfSelection.style.height=(r.h/mathPdfCanvas.height*100)+'%';mathPdfSelection.hidden=false;
+ $('mathPdfUse').disabled=r.w<12||r.h<12;
+}
+async function mathPdfRenderPage(){
+ if(!mathPdfDocument)return;
+ const n=Number($('mathPdfPage').value);if(!(n>=1&&n<=mathPdfDocument.numPages))return;
+ mathPdfResetSelection();$('mathPdfUse').disabled=true;$('mathPdfWhole').disabled=true;
+ mathPdfMessage('PDF-Seite wird dargestellt …');
+ try{
+  if(mathPdfRenderTask){try{mathPdfRenderTask.cancel()}catch(e){}mathPdfRenderTask=null}
+  const page=await mathPdfDocument.getPage(n);
+  const vp0=page.getViewport({scale:1});
+  const factor=Math.min(2,1400/vp0.width);const vp=page.getViewport({scale:factor});
+  mathPdfCanvas.width=Math.round(vp.width);mathPdfCanvas.height=Math.round(vp.height);
+  mathPdfRenderTask=page.render({canvasContext:mathPdfCanvas.getContext('2d',{alpha:false}),viewport:vp});
+  await mathPdfRenderTask.promise;mathPdfRenderTask=null;
+  mathPdfRendered=n;$('mathCropStage').hidden=false;$('mathPdfWhole').disabled=false;
+  mathPdfMessage('Seite '+n+' von '+mathPdfDocument.numPages+'. Ziehe einen Rahmen um die Aufgabe oder wähle die ganze Seite.');
+ }catch(e){if(e.name!=='RenderingCancelledException')mathPdfMessage('PDF-Seite konnte nicht dargestellt werden: '+e.message)}
+}
+$('mathPdfFile').addEventListener('change',async e=>{
+ const file=e.target.files[0];mathPdfDocument=null;mathPdfRendered=null;mathPdfResetSelection();$('mathCropStage').hidden=true;
+ $('mathPdfPage').disabled=true;$('mathPdfWhole').disabled=true;
+ if(!file){mathPdfMessage('Bitte eine PDF-Datei wählen.');return}
+ if(!/\.pdf$/i.test(file.name)&&file.type!=='application/pdf'){mathPdfMessage('Bitte eine PDF auswählen.');return}
+ if(file.size>35*1024*1024){mathPdfMessage('Die PDF ist größer als 35 MB. Bitte einzelne Seiten exportieren.');return}
+ mathPdfMessage('Öffne PDF … Beim ersten Mal wird eine Darstellungsbibliothek geladen.');
+ try{
+  const lib=await mathPdfLoadLibrary();const data=await file.arrayBuffer();
+  const task=lib.getDocument({data:new Uint8Array(data),useSystemFonts:true});mathPdfDocument=await task.promise;
+  const sel=$('mathPdfPage');sel.replaceChildren();for(let i=1;i<=mathPdfDocument.numPages;i++){const o=document.createElement('option');o.value=String(i);o.textContent='Seite '+i;sel.append(o)}
+  sel.disabled=false;await mathPdfRenderPage();
+ }catch(err){mathPdfMessage('PDF konnte nicht geöffnet werden ('+err.message+'). Prüfe die Internetverbindung oder probiere einen Screenshot.');}
+});
+$('mathPdfPage').addEventListener('change',mathPdfRenderPage);
+function mathPdfPoint(event){const r=mathPdfCanvas.getBoundingClientRect();return{x:Math.max(0,Math.min(mathPdfCanvas.width,(event.clientX-r.left)*mathPdfCanvas.width/r.width)),y:Math.max(0,Math.min(mathPdfCanvas.height,(event.clientY-r.top)*mathPdfCanvas.height/r.height))}}
+let mathPdfDragStart=null;
+mathPdfHolder.addEventListener('pointerdown',event=>{if(!mathPdfDocument||!mathPdfRendered)return;event.preventDefault();mathPdfDragStart=mathPdfPoint(event);mathPdfHolder.setPointerCapture(event.pointerId);mathPdfSelectionRect={x:mathPdfDragStart.x,y:mathPdfDragStart.y,w:0,h:0};mathPdfDrawSelection()});
+mathPdfHolder.addEventListener('pointermove',event=>{if(!mathPdfDragStart)return;event.preventDefault();const p=mathPdfPoint(event);mathPdfSelectionRect={x:Math.min(p.x,mathPdfDragStart.x),y:Math.min(p.y,mathPdfDragStart.y),w:Math.abs(p.x-mathPdfDragStart.x),h:Math.abs(p.y-mathPdfDragStart.y)};mathPdfDrawSelection()});
+function mathPdfDragEnd(){if(!mathPdfDragStart)return;mathPdfDragStart=null;mathPdfDrawSelection();if(mathPdfSelectionRect?.w>=12&&mathPdfSelectionRect?.h>=12)mathPdfMessage('Ausschnitt markiert. Wähle unten, welcher Aufgabe er zugeordnet werden soll.');}
+mathPdfHolder.addEventListener('pointerup',mathPdfDragEnd);mathPdfHolder.addEventListener('pointercancel',mathPdfDragEnd);
+$('mathPdfWhole').addEventListener('click',()=>{if(!mathPdfRendered)return;mathPdfSelectionRect={x:0,y:0,w:mathPdfCanvas.width,h:mathPdfCanvas.height};mathPdfDrawSelection();mathPdfMessage('Ganze Seite ausgewählt. Für einzelne Aufgaben besser einen engeren Rahmen ziehen.')});
+$('mathPdfUse').addEventListener('click',()=>{
+ const r=mathPdfSelectionRect;if(!r||r.w<12||r.h<12)return;
+ const cut=document.createElement('canvas');cut.width=Math.round(r.w);cut.height=Math.round(r.h);
+ cut.getContext('2d',{alpha:false}).drawImage(mathPdfCanvas,r.x,r.y,r.w,r.h,0,0,cut.width,cut.height);
+ cut.toBlob(blob=>{
+  if(!blob){mathPdfMessage('Ausschnitt konnte nicht exportiert werden.');return}
+  const target=Number($('mathPdfTarget').value);
+  const file=new File([blob],'PDF-Seite-'+mathPdfRendered+'-Ausschnitt.jpg',{type:'image/jpeg'});
+  mathPick(target,file);
+  $('mathFile'+(target+1)).value='';
+  mathPdfMessage('Ausschnitt in Feld '+(target+1)+' übernommen. Weitere Aufgabe markieren oder A4-Vorschau erzeugen.');
+ },'image/jpeg',0.96);
+});
 $('mathGenerate').addEventListener('click',mathGenerate);$('mathPrint').addEventListener('click',mathPrint);$('mathClear').addEventListener('click',mathClear);
 for(const id of ['mathTitle','mathClass','mathGrid','mathImageHeight','mathGridLabels'])$(id).addEventListener('change',()=>{mathDirty=true});
