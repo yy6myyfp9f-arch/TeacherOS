@@ -1,16 +1,26 @@
-TeacherOS v0.2 – Lehrerkalender integriert
+TeacherOS 0.3 – Unterrichtsstudio / Materialwerkstatt
 
-NEU: zusätzlicher Reiter "Lehrerkalender", vollständige PDF V8 und Direktlinks auf die PDF-Seiten.
+WAS NEU IST
+- Unterrichtsvorbereitung mit Fach, Klasse, Thema, Lernziel, Dauer, Materialhinweisen
+- Lokal gespeicherte Unterrichtsplanungen
+- KI-Aufträge für sechs Arten von Unterrichtsmaterial, darunter vorhandene PPTX überarbeiten
+- KI-Auftrag kopieren oder als TXT sichern und in ChatGPT verwenden
+- Bestehendes Dashboard, Lehrerkalender V8, Aufgaben, Notizen, ICS bleiben erhalten
 
-UPDATE DES BEREITS INSTALLIERTEN TEACHEROS:
-1. Bei GitHub in deinem bestehenden Repository TeacherOS unter "Add file" -> "Upload files" wechseln.
-2. Alle acht Dateien aus diesem ZIP-Paket hochladen (in dasselbe Hauptverzeichnis, nicht den Ordner selbst).
-3. Vorhandene Dateien namens index.html, app.js, sw.js, README.txt, manifest.webmanifest und Icons überschreiben/bestätigen.
-4. "Commit changes" drücken. GitHub Pages übernimmt die neue Version.
-5. TeacherOS am iPad neu öffnen, bei alter Anzeige Browserseite neu laden; ggf. App schließen/neu starten.
+AKTUALISIERUNG
+1. Vor dem Update in TeacherOS unter „Daten“ eine JSON-Sicherung exportieren.
+2. Alle acht Dateien dieser ZIP in das Stammverzeichnis deines GitHub-Repositories hochladen.
+3. Bestehende Dateinamen ersetzen, kein Unterverzeichnis anlegen.
+4. GitHub Pages auf main / root belassen. Falls alte Version sichtbar, Seite neu laden.
 
-WICHTIGER DATENSCHUTZ-HINWEIS:
-GitHub Pages ist öffentlich erreichbar; PDF und Programmdateien sind für alle mit der URL abrufbar.
-Nur die LEERE PDF-Vorlage hier ablegen. Keine Schülernamen, Noten, ausgefüllten Protokolle oder sonstigen sensiblen Daten veröffentlichen.
-Die Integration ist eine PDF-Leseansicht und KEINE GoodNotes-Synchronisation.
-TeacherOS-Aufgaben bleiben weiterhin im Browser des jeweiligen Geräts lokal gespeichert; diese Dateien ersetzen keine Benutzerdaten. Vor Updates empfiehlt sich eine JSON-Datensicherung über den Daten-Reiter.
+DATEN UND GRENZEN
+- Es findet KEINE direkte PPTX-Analyse oder KI-Verarbeitung in TeacherOS statt.
+- Für PowerPoint-Überarbeitung in ChatGPT den erzeugten Auftrag verwenden und PPTX dort separat hochladen.
+- Kein automatischer GoodNotes-Datenaustausch, kein Login, keine iPad-Lenovo-Synchronisierung.
+- Lokal gespeicherte Daten sind nicht verschlüsselt und nicht automatisch gesichert.
+- GitHub Pages ist öffentlich; KEINE personenbezogenen Schülerdaten oder ausgefüllte Lehrerkalender hochladen.
+- Bei schulischem Dienst-iPad lokale Datenhaltung und erlaubte Nutzung beachten.
+
+BACKUP
+- Das JSON-Backup enthält nun auch lessons, wenn vorhanden. Ältere Backups bleiben importierbar.
+- Vor einer Wiederherstellung immer erst das aktuelle Backup exportieren.
