@@ -1,9 +1,11 @@
-TeacherOS 0.7.2 – Screenshot aus der Zwischenablage & Fotos, inklusive Korrektur aus 0.7.1.
+TeacherOS 0.8 – neues Oberflächendesign (auf Basis von 0.7.2)
 
-NEU: Im Materialstudio unter „2 · Material hinzufügen“ gibt es „🖼️ Screenshot aus Fotos“ sowie „📋 Kopierten Screenshot einfügen“. Screenshot beispielsweise in Fotos öffnen → Teilen → Kopieren; in TeacherOS Unterrichtsreihe und Stunde auswählen → „Aus Zwischenablage übernehmen“. Je nach iPadOS/Safari kann die Browserberechtigung fehlen oder eine Freigabe erforderlich sein. Alternative: in das Einfügefeld tippen, gedrückt halten, „Einsetzen“ wählen. Wenn iPadOS den Bildinhalt per Einsetzen nicht bereitstellt, „Screenshot aus Fotos“ wählen; dieser Weg benötigt kein Kopieren. Kopierte Bilder werden nur lokal in IndexedDB der ausgewählten Unterrichtsstunde abgelegt.
+NEU: Überarbeitetes, responsives Dashboard mit ruhiger, moderner Farbpalette (Petrol, Salbei, Koralle), Sidebar-Navigation für große iPads/Computer und horizontalen Tabs auf kleinen Bildschirmen, neu gestalteten Karten, Formularen und Material-Upload-Bereichen. Die Funktionen und lokalen Speicherstrukturen wurden nicht verändert.
 
-ENTHÄLT v0.7.1: Neue Unterrichtsreihen erscheinen beim Wechsel ins Materialstudio, ohne die App neu zu starten. Mindestens eine Unterrichtsstunde muss vorhanden sein.
+ENTHÄLT sämtliche Funktionen aus 0.7.2: Unterrichtsreihen, Materialstudio mit Kamera, Fotoauswahl und Zwischenablage, MathLab, Unterrichtsstudio, GoodNotes-Kalender. Änderungen an app.js, reihen.js oder material.js wurden nicht vorgenommen.
 
-INSTALLATION: Erst Daten → JSON-Sicherung exportieren. ZIP entpacken, ALLE enthaltenen Dateien im GitHub-Repo ins Hauptverzeichnis hochladen und vorhandene Dateien ersetzen; Commit changes. App NICHT deinstallieren und keine Websitedaten löschen. Nach Deployment ggf. die Ansicht neu laden, damit der Service Worker v0.7.2 aktiv wird.
+INSTALLATION: Vorher unter Daten JSON-Sicherung exportieren. ZIP entpacken und alle enthaltenen Dateien im GitHub-Repo-Hauptverzeichnis ersetzen (Commit changes). App nicht deinstallieren; keine Website-Daten löschen. Eventuell neue Version nach GitHub-Deployment laden.
 
-SICHERHEIT: Bildmaterialien, Screenshots und Schulbuchseiten NICHT ins öffentliche GitHub-Repository hochladen. JSON-Backup enthält die separat gespeicherten Materialdateien NICHT; Originale separat sicher aufbewahren. Keine automatische Übergabe an ChatGPT und keine zusätzlichen API-Kosten. max. 35 MB pro Datei. iPadOS-Paste-Verhalten hängt von den Browserberechtigungen ab, ist bislang nicht auf dem Nutzer-iPad getestet.
+DATENSCHUTZ: Nie Schulbuchseiten oder personenbezogene Schülerdaten ins öffentliche GitHub-Repo hochladen. Material-Dateien aus IndexedDB sind nicht Teil des JSON-Exports.
+
+TEST: CSS und JS separat geprüft; visuelle Darstellung mit Chromium-Screenshot kontrolliert. Ein iPad-Praxistest steht noch aus.
