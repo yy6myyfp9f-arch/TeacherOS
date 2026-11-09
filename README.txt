@@ -1,3 +1,5 @@
+TeacherOS 0.7.1 · Korrektur: Das Materialstudio aktualisiert die Unterrichtsreihen-Liste beim Öffnen. Neu angelegte Reihen erscheinen nun ohne Neustart. Für einen Datei-Upload muss mindestens eine Unterrichtsstunde in der Reihe angelegt sein.
+
 TeacherOS 0.7 · Materialstudio (lokaler Prototyp)
 
 UPDATE: Sichere zuerst unter Daten → JSON exportieren. Entpacke die ZIP und lade alle Dateien aus diesem Ordner (nicht den Ordner selbst) ins Wurzelverzeichnis des GitHub-Repositories, vorhandene Dateien ersetzen. Neu: material.js. Die installierte PWA NICHT deinstallieren.
