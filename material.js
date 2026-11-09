@@ -47,6 +47,57 @@ async function matUpload(input){const lesson=matSelectedLesson();if(!lesson){mat
  }
  input.value='';if(saved)matMessage(saved+' Datei(en) lokal dieser Stunde zugeordnet. Originale bitte zusätzlich sicher aufbewahren.');await matRefresh();
 }
+// Screenshots aus der iPad-Zwischenablage lokal übernehmen; Browser-Berechtigungen gelten weiterhin.
+async function matSaveClipboardImage(blob){
+ const lesson=matSelectedLesson();
+ if(!lesson){matMessage('Bitte zuerst eine Unterrichtsstunde auswählen.');return false}
+ if(!blob||!blob.type.startsWith('image/')){matMessage('Die Zwischenablage enthält kein unterstütztes Bild.');return false}
+ if(blob.size>35*1024*1024){matMessage('Der Screenshot ist größer als 35 MB.');return false}
+ const extension=blob.type==='image/jpeg'?'jpg':blob.type==='image/webp'?'webp':blob.type==='image/gif'?'png':'png';
+ // GIF/andere Typen behalten nur dann die richtige Endung, wenn der MIME-Typ unterstützt ist.
+ const actualExt=blob.type==='image/gif'?'gif':extension;
+ const filename='Screenshot-'+new Date().toISOString().replace(/[:.]/g,'-')+'.'+actualExt;
+ try{
+  await matPut({id:crypto.randomUUID(),lessonId:lesson.id,created:new Date().toISOString(),name:filename,type:blob.type,blob});
+  await matRefresh();matMessage('✓ Kopierter Screenshot wurde dieser Unterrichtsstunde lokal hinzugefügt.');
+  matEl('matPasteZone').replaceChildren();
+  return true;
+ }catch(e){matMessage('Screenshot konnte nicht gespeichert werden: '+e.message);return false}
+}
+matEl('matPasteButton').addEventListener('click',async()=>{
+ if(!matSelectedLesson()){matMessage('Bitte zuerst eine Unterrichtsstunde auswählen.');return}
+ if(!navigator.clipboard||typeof navigator.clipboard.read!=='function'){
+  matMessage('Der direkte Zugriff auf die Zwischenablage ist auf diesem Gerät nicht verfügbar. Tippe in das Feld darunter, halte gedrückt und wähle „Einsetzen“.');
+  matEl('matPasteZone').focus();return;
+ }
+ try{
+  const items=await navigator.clipboard.read();
+  for(const item of items){
+   const type=item.types.find(t=>t.startsWith('image/') && ['image/png','image/jpeg','image/webp','image/gif'].includes(t));
+   if(type){await matSaveClipboardImage(await item.getType(type));return}
+  }
+  matMessage('Kein Bild in der Zwischenablage. Kopiere zuerst einen Screenshot in der Fotos-App.');
+ }catch(e){
+  matMessage('iPadOS hat den direkten Zugriff nicht erlaubt. Tippe in das Feld darunter, halte gedrückt und wähle „Einsetzen“.');
+  matEl('matPasteZone').focus();
+ }
+});
+matEl('matPasteZone').addEventListener('paste',async event=>{
+ const data=event.clipboardData;
+ if(!data)return;
+ const files=[...(data.files||[])];
+ let blob=files.find(f=>f.type.startsWith('image/'));
+ if(!blob){for(const item of data.items||[]){if(item.kind==='file'&&item.type.startsWith('image/')){blob=item.getAsFile();break}}}
+ if(blob){event.preventDefault();await matSaveClipboardImage(blob)}
+ else{event.preventDefault();matMessage('Es wurde kein Screenshot eingefügt. Bitte ein Bild kopieren und erneut versuchen.')}
+});
+matEl('matPasteZone').addEventListener('input',()=>{
+ // Keine versehentlich eingefügten Texte oder HTML-Bilder im Feld stehen lassen.
+ const zone=matEl('matPasteZone');
+ if(zone.textContent.trim()||zone.querySelector('img')){
+  zone.replaceChildren();matMessage('Bitte ein Bild aus der Zwischenablage einfügen; Texte werden nicht als Material gespeichert.');
+ }
+});
 function matType(name){if(/\.pdf$/i.test(name))return'application/pdf';if(/\.docx$/i.test(name))return'application/vnd.openxmlformats-officedocument.wordprocessingml.document';if(/\.pptx$/i.test(name))return'application/vnd.openxmlformats-officedocument.presentationml.presentation';return 'application/octet-stream'}
 const matCanvas=matEl('matCanvas'), matHolder=matEl('matHolder'),matRect=matEl('matRect');
 function matCloseCrop(){matEl('matCropPanel').hidden=true;matEl('matCropSave').disabled=true;matSelection=null;matDrag=null;matCanvasActive=false;matPdfDoc=null;matCurrentFile=null;matRect.hidden=true}
@@ -86,5 +137,5 @@ matEl('matPromptBuild').addEventListener('click',async()=>{
 });
 matEl('matPromptCopy').addEventListener('click',async()=>{if(!matPromptText){matMessage('Erstelle zunächst einen KI-Auftrag.');return}try{await navigator.clipboard.writeText(matPromptText);matMessage('Auftrag kopiert. Jetzt in ChatGPT einfügen und die Originaldateien zusätzlich hochladen.')}catch(e){matMessage('Automatisches Kopieren nicht möglich. Auftrag bitte manuell markieren.')}});
 matEl('matSeries').addEventListener('change',()=>matFillLessons(false));matEl('matLesson').addEventListener('change',matRefresh);
-matEl('matCamera').addEventListener('change',e=>matUpload(e.target));matEl('matFiles').addEventListener('change',e=>matUpload(e.target));
+matEl('matCamera').addEventListener('change',e=>matUpload(e.target));matEl('matPhotos').addEventListener('change',e=>matUpload(e.target));matEl('matFiles').addEventListener('change',e=>matUpload(e.target));
 matFillSeries(false);
