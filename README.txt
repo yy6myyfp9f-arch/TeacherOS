@@ -1,14 +1,81 @@
-TeacherOS 0.8 – neues Oberflächendesign (auf Basis von 0.7.2)
+TEACHEROS 1.0 – MEINE WOCHE · UNTERRICHTSPLANUNG · SPRACHE
+===========================================================
+Stand: 10. November 2026
 
-NEU: Überarbeitetes, responsives Dashboard mit ruhiger, moderner Farbpalette (Petrol, Salbei, Koralle), Sidebar-Navigation für große iPads/Computer und horizontalen Tabs auf kleinen Bildschirmen, neu gestalteten Karten, Formularen und Material-Upload-Bereichen. Die Funktionen und lokalen Speicherstrukturen wurden nicht verändert.
+UPDATE AUS DER VORHERIGEN VERSION (0.8.1):
+1. TeacherOS auf iPad unter "Werkzeuge & Daten" -> "Daten & Sicherung" als JSON sichern.
+2. Die entpackten Dateien dieses Pakets in das öffentliche GitHub-Repository
+   yy6myyfp9f-arch/TeacherOS hochladen und bestehende Dateien ersetzen.
+   Nicht die JSON-Datei, keine Schulbuchfotos, keine Schülerdaten zu GitHub hochladen!
+3. "Commit changes" bestätigen und nach dem Deploy die bestehende TeacherOS-App öffnen.
+   Bitte die App NICHT löschen – dadurch könnten lokal gespeicherte Materialien verschwinden.
+4. Ab jetzt erscheint "Meine Woche" als Startseite.
+5. Falls die PWA noch alte Dateien anzeigt: im Browser erneut die GitHub-Pages-Seite
+   öffnen und wiederholt neu laden; Service Worker benötigt u. U. einen weiteren Start.
 
-ENTHÄLT sämtliche Funktionen aus 0.7.2: Unterrichtsreihen, Materialstudio mit Kamera, Fotoauswahl und Zwischenablage, MathLab, Unterrichtsstudio, GoodNotes-Kalender. Änderungen an app.js, reihen.js oder material.js wurden nicht vorgenommen.
+WAS IST NEU?
+- Grundstundenplan einmalig, danach wöchentlich wiederkehrend.
+- iPad: Wochenraster Montag bis Freitag / 1.–9. Stunde.
+- iPhone: großflächige Tageskarten, Wochentage einzeln anwählbar.
+- Einzeltermine vs. dauerhafte Änderungen ab gewähltem Datum.
+- Stunden tauschen, in freie Felder verschieben, Stunden entfallen lassen.
+  Verknüpfte Unterrichtsplanung geht beim Tauschen/Verschieben mit.
+- Unterrichtsreihen und bereits angelegte Reihenstunden mit Terminen verknüpfen.
+- Aus einem Unterrichtstermin: Planung speichern, Materialstudio öffnen,
+  ChatGPT-Materialauftrag erzeugen, Sprachplanung / Rückblick starten.
+- Geplante Inhalte auf den nächsten passenden Termin derselben Klasse/Fach übernehmen.
+- Offizielle BW-Schulferien 2026/27 und 2027/28 (auch 2028/29 schon enthalten),
+  Gründonnerstage/Reformationsfeste gemäß Ministeriumsangabe und gesetzliche Feiertage.
+- Individuelle bewegliche Ferientage / schulfreie Tage eintragbar.
+- Navigation vereinfacht: Woche, Reihen, Aufgaben, Kalender, Werkzeuge & Daten.
+- Sprachplanung, lokaler Audio-Recorder und WebUntis-Weblink aus 0.9 enthalten.
+  Version 0.9 muss NICHT separat installiert werden.
 
-INSTALLATION: Vorher unter Daten JSON-Sicherung exportieren. ZIP entpacken und alle enthaltenen Dateien im GitHub-Repo-Hauptverzeichnis ersetzen (Commit changes). App nicht deinstallieren; keine Website-Daten löschen. Eventuell neue Version nach GitHub-Deployment laden.
+SO LEGST DU DEN GRUNDSTUNDENPLAN AN:
+- "Meine Woche" öffnen, eine leere Stundenplankachel antippen.
+- Fach und Klasse eingeben. Optional Unterrichtsreihe wählen.
+- Bei einem freien Feld ist "Dauerhaft ab diesem Datum" vorausgewählt.
+- "Stundenplan speichern" tippen. Der Eintrag wiederholt sich wöchentlich.
+- Einmalige Änderungen über "Nur diesen Termin".
+- Stunden tauschen: "Stunden tauschen" -> Ausgang -> Ziel. Für Verschieben
+  ein freies Zielfeld wählen. Auch über mehrere Wochen möglich.
 
-DATENSCHUTZ: Nie Schulbuchseiten oder personenbezogene Schülerdaten ins öffentliche GitHub-Repo hochladen. Material-Dateien aus IndexedDB sind nicht Teil des JSON-Exports.
+UNTERRICHTSPLANUNG DIREKT AUS DER STUNDE:
+- Stunde antippen, Reihe verknüpfen, Stundenthema/Lernziel/Planung/Status bearbeiten.
+- "Unterrichtsplanung speichern".
+- "Material hinzufügen" eröffnet das Materialstudio mit derselben Reihe und Stunde.
+- "Material erstellen" zeigt einen kopierbaren KI-Auftrag an – echte Dateien
+  werden nicht innerhalb dieser kostenlosen, lokalen PWA generiert. Für die
+  Materialerstellung ChatGPT öffnen und vorhandene Dateien dort selbst anhängen.
+- "Sprachplanung" / "Rückblick" verwendet Diktat der iOS-Tastatur oder lokale
+  Audioaufnahme. Audio wird NICHT transkribiert und NICHT per JSON exportiert.
 
-TEST: CSS und JS separat geprüft; visuelle Darstellung mit Chromium-Screenshot kontrolliert. Ein iPad-Praxistest steht noch aus.
+FERIEN & UNTERRICHTSFREIE TAGE:
+- Offizielle Ferien: https://km.baden-wuerttemberg.de/de/service/ferien
+- Gesetzliche Feiertage BW werden nach Kalenderdaten berechnet.
+- Schulinterne bewegliche Ferientage sind NICHT bekannt und müssen manuell unter
+  "Unterrichtsfreie Tage & Grundstundenplan verwalten" ergänzt werden.
+- Unterricht während Ferien kann als Einzel-Ausnahme manuell eingetragen werden.
+- Ferien entfernen keine Planungen oder Unterrichtsreihen.
 
+DATEN & SICHERHEIT:
+- Daten bleiben unter dem bisherigen LocalStorage-Schlüssel teacheros-v01.
+- Alte Datenfelder (tasks, notes, events, reihen, slots, lessons) bleiben erhalten.
+- Neue Stundenplandaten im JSON-Export unter data.scheduleV1.
+- Bereits bestehende Einträge aus dem alten Stundenplan werden vorsichtig als
+  unklassifizierte Termine übernommen, Fach/Klasse also nicht erraten.
+- Bilder/PDFs aus dem Materialstudio und Audioaufnahmen sind separat lokal
+  gespeichert und NICHT Teil der JSON-Sicherung.
+- Geräte synchronisieren NICHT automatisch. iPad -> iPhone nur über manuelle
+  JSON-Übertragung (z. B. AirDrop) und anschließenden Import.
+- Keine WebUntis-API: nur Schnelllink zur WebUntis-Webseite.
+- Es handelt sich um eine private PWA, kein Schulverwaltungssystem.
+- Datenschutz beachten: keine personenbezogenen Schülerdaten speichern.
 
-0.8.1 – Materialstudio: Sichtbarer Hinweis auf die ausgewählte Unterrichtsstunde, eindeutige Statusrückmeldung nach dem Fotoimport, zusätzlicher Button zum erneuten Übernehmen. Der Datei-Input wird nach erfolgreichem Speichern nicht mehr geleert; iPadOS zeigt dadurch nicht fälschlich sofort „Keine Datei ausgewählt“. Bei nur einer Reihe/Stunde automatische Vorauswahl. Kein Löschen vorhandener Daten.
+TECHNISCHE PRÜFUNG:
+- JavaScript-Syntax der Module geprüft.
+- Browser-Test der Wochenansicht, wöchentlichen Wiederholung, Zuordnung zu Reihen,
+  Planungsdaten, KI-Auftrag und Materialstudio-Navigation durchgeführt.
+- Darstellung der Wochenansicht auf Desktop und in schmaler Handy-Ansicht geprüft.
+- Echte Kamera-/Mikrofon-Berechtigungen unter iOS sowie PWA-Cache-Aktualisierung
+  sind weiterhin am Zielgerät zu testen.
