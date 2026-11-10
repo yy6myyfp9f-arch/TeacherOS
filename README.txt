@@ -9,3 +9,6 @@ INSTALLATION: Vorher unter Daten JSON-Sicherung exportieren. ZIP entpacken und a
 DATENSCHUTZ: Nie Schulbuchseiten oder personenbezogene Schülerdaten ins öffentliche GitHub-Repo hochladen. Material-Dateien aus IndexedDB sind nicht Teil des JSON-Exports.
 
 TEST: CSS und JS separat geprüft; visuelle Darstellung mit Chromium-Screenshot kontrolliert. Ein iPad-Praxistest steht noch aus.
+
+
+0.8.1 – Materialstudio: Sichtbarer Hinweis auf die ausgewählte Unterrichtsstunde, eindeutige Statusrückmeldung nach dem Fotoimport, zusätzlicher Button zum erneuten Übernehmen. Der Datei-Input wird nach erfolgreichem Speichern nicht mehr geleert; iPadOS zeigt dadurch nicht fälschlich sofort „Keine Datei ausgewählt“. Bei nur einer Reihe/Stunde automatische Vorauswahl. Kein Löschen vorhandener Daten.

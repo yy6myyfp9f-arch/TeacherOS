@@ -19,13 +19,36 @@ async function matDelete(id){const db=await matDb();return new Promise((resolve,
 function matSelectedSeries(){return (state.reihen||[]).find(r=>r.id===matEl('matSeries').value)}
 function matSelectedLesson(){return matSelectedSeries()?.lessons?.find(l=>l.id===matEl('matLesson').value)}
 function matCreate(tag,cls,value){const x=document.createElement(tag);if(cls)x.className=cls;if(value!==undefined)x.textContent=value;return x}
-function matFillSeries(keep=true){const old=keep?matEl('matSeries').value:'';const sel=matEl('matSeries');sel.replaceChildren(new Option('— Unterrichtsreihe auswählen —',''));for(const r of state.reihen||[])sel.add(new Option(r.title+' · '+r.subject,r.id));if((state.reihen||[]).some(r=>r.id===old))sel.value=old;matFillLessons()}
-function matFillLessons(keep=true){const sel=matEl('matLesson'),old=keep?sel.value:'';sel.replaceChildren(new Option('— Unterrichtsstunde auswählen —',''));for(const l of matSelectedSeries()?.lessons||[])sel.add(new Option(l.topic,l.id));if((matSelectedSeries()?.lessons||[]).some(l=>l.id===old))sel.value=old;matRefresh()}
+function matFillSeries(keep=true){
+ const old=keep?matEl('matSeries').value:'';const sel=matEl('matSeries');
+ sel.replaceChildren(new Option('— Unterrichtsreihe auswählen —',''));
+ for(const r of state.reihen||[])sel.add(new Option(r.title+' · '+r.subject,r.id));
+ if((state.reihen||[]).some(r=>r.id===old))sel.value=old;
+ else if((state.reihen||[]).length===1)sel.value=state.reihen[0].id;
+ matFillLessons();
+}
+function matFillLessons(keep=true){
+ const sel=matEl('matLesson'),old=keep?sel.value:'';
+ const lessons=matSelectedSeries()?.lessons||[];
+ sel.replaceChildren(new Option('— Unterrichtsstunde auswählen —',''));
+ for(const l of lessons)sel.add(new Option(l.topic,l.id));
+ if(lessons.some(l=>l.id===old))sel.value=old;
+ // Bei genau einer Stunde wird das Uploadziel automatisch eindeutig festgelegt.
+ else if(lessons.length===1)sel.value=lessons[0].id;
+ matRefresh();
+}
 function matOpenLesson(seriesId,lessonId){matFillSeries(false);matEl('matSeries').value=seriesId;matFillLessons(false);matEl('matLesson').value=lessonId;matRefresh()}
 async function matRefresh(){
+ const series=matSelectedSeries(),lesson=matSelectedLesson();
+ const target=matEl('matUploadTarget');
+ if(target){
+  target.textContent=lesson?`✓ Uploadziel: ${series.title} → ${lesson.topic}`:
+   series?'Bitte zunächst eine Unterrichtsstunde auswählen. Ohne ausgewählte Stunde kann keine Datei gespeichert werden.':'Bitte zuerst Unterrichtsreihe und Unterrichtsstunde auswählen.';
+  target.classList.toggle('mat-target-warn',!lesson);
+ }
  matCloseCrop();matPromptText='';matEl('matPrompt').textContent='KI-Auftrag noch nicht erstellt. Dateien müssen zusätzlich in ChatGPT hochgeladen werden.';
  for(const url of matObjectUrls)URL.revokeObjectURL(url);matObjectUrls=[];
- const lesson=matSelectedLesson(),list=matEl('matList');list.replaceChildren();matEl('matCount').textContent='';
+ const list=matEl('matList');list.replaceChildren();matEl('matCount').textContent='';
  if(!lesson){list.append(matCreate('p','muted','Bitte eine Unterrichtsreihe und eine Stunde auswählen.'));return}
  try{const files=await matListFiles(lesson.id);if(matSelectedLesson()?.id!==lesson.id)return;
  matEl('matCount').textContent=files.length+' Datei(en)';if(!files.length){list.append(matCreate('p','muted','Noch keine Dateien für diese Stunde.'));return}
@@ -37,15 +60,26 @@ async function matRefresh(){
  }catch(e){list.append(matCreate('p','muted','Dateien konnten nicht geladen werden: '+e.message))}
 }
 function matDownload(f){const url=URL.createObjectURL(f.blob),a=document.createElement('a');a.href=url;a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),20000)}
-async function matUpload(input){const lesson=matSelectedLesson();if(!lesson){matMessage('Bitte zuerst eine Unterrichtsstunde auswählen.');input.value='';return}
- const files=[...input.files];if(!files.length)return;
- let saved=0;for(const file of files){
-  if(file.size>35*1024*1024){matMessage(file.name+' ist größer als 35 MB und wurde übersprungen.');continue}
-  if(!(/\.(pdf|png|jpe?g|webp|docx|pptx)$/i.test(file.name)||file.type.startsWith('image/'))){matMessage('Dateityp nicht unterstützt: '+file.name);continue}
+async function matUpload(input){
+ const lesson=matSelectedLesson();
+ const files=[...(input.files||[])];
+ if(!files.length){matMessage('Keine Datei übergeben. Bitte über „Fotos“ oder „Dateien“ ein Bild auswählen.');return}
+ if(!lesson){matMessage('⚠️ '+files.length+' Datei(en) ausgewählt, aber noch keine Unterrichtsstunde als Ziel gewählt. Wähle oben eine Stunde und tippe dann auf „Ausgewählte Dateien übernehmen“.');return}
+ const button=matEl('matUploadConfirm');if(button)button.disabled=true;
+ matMessage('Übernehme '+files.length+' Datei(en) für „'+lesson.topic+'“ …');
+ let saved=0,failed=[];for(const file of files){
+  if(file.size>35*1024*1024){failed.push(file.name+' (größer als 35 MB)');continue}
+  if(!(/\.(pdf|png|jpe?g|webp|heic|heif|docx|pptx)$/i.test(file.name)||file.type.startsWith('image/'))){failed.push(file.name+' (Dateityp nicht unterstützt)');continue}
   try{await matPut({id:crypto.randomUUID(),lessonId:lesson.id,created:new Date().toISOString(),name:file.name,type:file.type||matType(file.name),blob:file});saved++}
-  catch(e){matMessage('Speichern fehlgeschlagen: '+e.message+'. Prüfe Speicherplatz und Browser-Berechtigungen.');break}
+  catch(e){failed.push(file.name+' (Speichern fehlgeschlagen: '+e.message+')');break}
  }
- input.value='';if(saved)matMessage(saved+' Datei(en) lokal dieser Stunde zugeordnet. Originale bitte zusätzlich sicher aufbewahren.');await matRefresh();
+ if(saved){
+  // Nicht sofort input.value leeren: iPadOS würde sonst „Keine Datei ausgewählt“ anzeigen,
+  // obwohl das Foto erfolgreich gespeichert wurde.
+  matMessage('✓ '+saved+' Datei(en) gespeichert für „'+lesson.topic+'“. Sie erscheinen weiter unten unter „Materialien der ausgewählten Stunde“.'+(failed.length?' Nicht übernommen: '+failed.join('; '):''));
+ }else matMessage('Keine Datei gespeichert. '+(failed.join('; ')||'Bitte Datei erneut auswählen.'));
+ if(button)button.disabled=false;
+ await matRefresh();
 }
 // Screenshots aus der iPad-Zwischenablage lokal übernehmen; Browser-Berechtigungen gelten weiterhin.
 async function matSaveClipboardImage(blob){
@@ -137,5 +171,12 @@ matEl('matPromptBuild').addEventListener('click',async()=>{
 });
 matEl('matPromptCopy').addEventListener('click',async()=>{if(!matPromptText){matMessage('Erstelle zunächst einen KI-Auftrag.');return}try{await navigator.clipboard.writeText(matPromptText);matMessage('Auftrag kopiert. Jetzt in ChatGPT einfügen und die Originaldateien zusätzlich hochladen.')}catch(e){matMessage('Automatisches Kopieren nicht möglich. Auftrag bitte manuell markieren.')}});
 matEl('matSeries').addEventListener('change',()=>matFillLessons(false));matEl('matLesson').addEventListener('change',matRefresh);
-matEl('matCamera').addEventListener('change',e=>matUpload(e.target));matEl('matPhotos').addEventListener('change',e=>matUpload(e.target));matEl('matFiles').addEventListener('change',e=>matUpload(e.target));
+matEl('matCamera').addEventListener('change',e=>matUpload(e.target));
+matEl('matPhotos').addEventListener('change',e=>matUpload(e.target));
+matEl('matFiles').addEventListener('change',e=>matUpload(e.target));
+matEl('matUploadConfirm').addEventListener('click',async()=>{
+ const inputs=['matPhotos','matFiles','matCamera'].map(matEl).filter(x=>x.files?.length);
+ if(!inputs.length){matMessage('Noch keine Bild- oder Dokumentdatei ausgewählt. Tippe zuerst auf „Datei auswählen“ oder „Foto auswählen“.');return}
+ for(const input of inputs)await matUpload(input);
+});
 matFillSeries(false);
